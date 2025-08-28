@@ -1,0 +1,14 @@
+[Unit]
+Description=Simple driver for 10moons T503 tablet for linux
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /etc/opt/10moons/driver.py
+Restart=on-failure
+# Environment variables if needed
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/yourusername/.Xauthority
+
+[Install]
+WantedBy=multi-user.target
