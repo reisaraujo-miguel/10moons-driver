@@ -1,0 +1,5 @@
+# Start service when device is connected
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="08f2", ATTRS{idProduct}=="6811", TAG+="systemd", ENV{SYSTEMD_WANTS}="10moons-driver.service"
+
+# Stop service when device is disconnected
+ACTION=="remove", SUBSYSTEM=="usb", ATTRS{idVendor}=="08f2", ATTRS{idProduct}=="6811", RUN+="/bin/systemctl stop 10moons-driver.service"
