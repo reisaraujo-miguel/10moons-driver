@@ -1,13 +1,16 @@
+#!/usr/bin/env python3
+
 # Proper test driver for the 10moons graphics tablet
 
 import os
 import sys
 
-# Specification of the device https://python-evdev.readthedocs.io/en/latest/
-from evdev import UInput, ecodes, AbsInfo
 # Establish usb communication with device
 import usb
 import yaml
+
+# Specification of the device https://python-evdev.readthedocs.io/en/latest/
+from evdev import AbsInfo, UInput, ecodes
 
 path = os.path.join(os.path.dirname(__file__), "config.yaml")
 # Loading tablet configuration
@@ -39,10 +42,16 @@ btn_codes = temp
 pen_events = {
     ecodes.EV_KEY: pen_codes,
     ecodes.EV_ABS: [
-        #AbsInfo input: value, min, max, fuzz, flat
-        (ecodes.ABS_X, AbsInfo(0, 0, config["pen"]["max_x"], 0, 0, config["pen"]["resolution_x"])),         
-        (ecodes.ABS_Y, AbsInfo(0, 0, config["pen"]["max_y"], 0, 0, config["pen"]["resolution_y"])),
-        (ecodes.ABS_PRESSURE, AbsInfo(0, 0, config["pen"]["max_pressure"], 0, 0, 0))
+        # AbsInfo input: value, min, max, fuzz, flat
+        (
+            ecodes.ABS_X,
+            AbsInfo(0, 0, config["pen"]["max_x"], 0, 0, config["pen"]["resolution_x"]),
+        ),
+        (
+            ecodes.ABS_Y,
+            AbsInfo(0, 0, config["pen"]["max_y"], 0, 0, config["pen"]["resolution_y"]),
+        ),
+        (ecodes.ABS_PRESSURE, AbsInfo(0, 0, config["pen"]["max_pressure"], 0, 0, 0)),
     ],
 }
 
@@ -78,27 +87,27 @@ x1, x2, y1, y2 = (3, 2, 5, 4) if config["settings"]["swap_axis"] else (5, 4, 3, 
 while True:
     try:
         data = dev.read(ep.bEndpointAddress, ep.wMaxPacketSize)
-        if data[1] in [192, 193]: # Pen actions
+        if data[1] in [192, 193]:  # Pen actions
             pen_x = abs(max_x - (data[x1] * 255 + data[x2]))
             pen_y = abs(max_y - (data[y1] * 255 + data[y2]))
             pen_pressure = data[7] * 255 + data[6]
             vpen.write(ecodes.EV_ABS, ecodes.ABS_X, pen_x)
             vpen.write(ecodes.EV_ABS, ecodes.ABS_Y, pen_y)
             vpen.write(ecodes.EV_ABS, ecodes.ABS_PRESSURE, pen_pressure)
-            if data[1] == 192: # Pen touch
+            if data[1] == 192:  # Pen touch
                 vpen.write(ecodes.EV_KEY, ecodes.BTN_TOUCH, 0)
             else:
                 vpen.write(ecodes.EV_KEY, ecodes.BTN_TOUCH, 1)
-        elif data[0] == 2: # Tablet button actions
+        elif data[0] == 2:  # Tablet button actions
             # press types: 0 - up; 1 - down; 2 - hold
             press_type = 1
-            if data[1] == 2: # First button
+            if data[1] == 2:  # First button
                 pressed = 0
-            elif data[1] == 4: # Second button
+            elif data[1] == 4:  # Second button
                 pressed = 1
-            elif data[3] == 44: # Third button
+            elif data[3] == 44:  # Third button
                 pressed = 2
-            elif data[3] == 43: # Fourth button
+            elif data[3] == 43:  # Fourth button
                 pressed = 3
             else:
                 press_type = 0
@@ -114,8 +123,8 @@ while True:
             vpen.close()
             raise Exception("Device has been disconnected")
     except KeyboardInterrupt:
-    	vpen.close()
-    	vbtn.close()
-    	sys.exit("\nDriver terminated successfully.")
+        vpen.close()
+        vbtn.close()
+        sys.exit("\nDriver terminated successfully.")
     except Excception as e:
-    	print(e)
+        print(e)

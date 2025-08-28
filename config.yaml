@@ -13,9 +13,9 @@ actions:
     pen_touch: BTN_TOUCH
     tablet_buttons:
         - KEY_LEFTCTRL+KEY_Z
-        - KEY_LEFTCTRL+KEY_A
-        - KEY_C
-        - KEY_D
+        - KEY_LEFTCTRL+KEY_Y
+        - KEY_F
+        - KEY_LEFTSHIFT+KEY_F
 settings:
     swap_axis: false
     swap_direction_x: true
